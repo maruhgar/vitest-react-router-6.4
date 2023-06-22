@@ -1,0 +1,50 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import '@testing-library/jest-dom';
+import {
+  createBrowserRouter,
+  createMemoryRouter,
+  RouterProvider,
+} from 'react-router-dom';
+import routes from './appRoutes';
+
+test('full app rendering/navigating', async () => {
+  const router = createBrowserRouter(routes);
+  render(<RouterProvider router={router}></RouterProvider>);
+
+  const user = userEvent.setup();
+
+  // verify page content for default route
+  expect(screen.getByText(/home/i)).toBeInTheDocument();
+
+  // verify page content for expected route after navigating
+  await user.click(screen.getByText(/home/i));
+  expect(screen.getByText(/you are home/i)).toBeInTheDocument();
+
+  // verify page content for expected route after navigating
+  await user.click(screen.getByText(/about/i));
+  expect(screen.getByText(/you are on the about page/i)).toBeInTheDocument();
+});
+
+test('landing on a bad page', () => {
+  const badRoute = '/some/bad/route';
+  const router = createMemoryRouter(routes, { initialEntries: [badRoute] });
+
+  // use createMemoryRouter when you want to manually control the history
+  render(<RouterProvider router={router}></RouterProvider>);
+
+  // verify navigation to "no match" route
+  expect(screen.getByText(/no match/i)).toBeInTheDocument();
+});
+
+test('rendering a component that uses useLocation', () => {
+  const route = '/some-route';
+  const router = createMemoryRouter(routes, { initialEntries: [route] });
+
+  // use createMemoryRouter when you want to manually control the history
+  render(<RouterProvider router={router}></RouterProvider>);
+
+  // verify location display is rendered
+  expect(screen.getByTestId('location-display')).toHaveTextContent(route);
+});
