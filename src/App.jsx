@@ -3,11 +3,29 @@ import {
   Link,
   Outlet,
   RouterProvider,
+  useLoaderData,
   useLocation,
 } from 'react-router-dom';
 
+export function sleep(n = 500) {
+  return new Promise((r) => setTimeout(r, n));
+}
+
+// Method to introduce an artificial delay
+export async function homeLoader() {
+  await sleep();
+  return {
+    message: 'home',
+  };
+}
+
 export const About = () => <div>You are on the about page</div>;
-export const Home = () => <div>You are home</div>;
+
+export const Home = () => {
+  let data = useLoaderData();
+  return <div>You are {data.message}</div>;
+};
+
 export const NoMatch = () => <div>No match</div>;
 
 export const LocationDisplay = () => {
@@ -36,6 +54,7 @@ export const routes = [
       {
         index: true,
         element: <Home />,
+        loader: homeLoader,
       },
       {
         path: '/about',

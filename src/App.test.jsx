@@ -14,7 +14,8 @@ test('full app rendering/navigating', async () => {
   render(<RouterProvider router={router}></RouterProvider>);
 
   const user = userEvent.setup();
-  expect(screen.getByText(/you are home/i)).toBeInTheDocument();
+  // We need to wait for the loader data and then assert presence
+  expect(await screen.findByText(/you are home/i)).toBeInTheDocument();
 
   // verify page content for expected route after navigating
   await user.click(screen.getByText(/about/i));
